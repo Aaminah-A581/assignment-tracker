@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Load Week 1 Tasks - Assignment Tracker</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2563eb;
+            margin-bottom: 20px;
+        }
+        h2 {
+            color: #4b5563;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+        button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 10px 10px 0;
+        }
+        button:hover {
+            background: #1d4ed8;
+        }
+        .success {
+            background: #22c55e;
+        }
+        .success:hover {
+            background: #16a34a;
+        }
+        .warning {
+            background: #f59e0b;
+        }
+        .warning:hover {
+            background: #d97706;
+        }
+        .danger {
+            background: #ef4444;
+        }
+        .danger:hover {
+            background: #dc2626;
+        }
+        .message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+            display: none;
+        }
+        .message.success {
+            background: #d1fae5;
+            color: #065f46;
+            display: block;
+        }
+        .message.error {
+            background: #fee2e2;
+            color: #991b1b;
+            display: block;
+        }
+        .quest-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: #f9fafb;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+        }
+        .quest-title {
+            font-weight: bold;
+            color: #1f2937;
+            margin-bottom: 10px;
+        }
+        .task-list {
+            list-style: none;
+            padding: 0;
+        }
+        .task-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .task-list li:last-child {
+            border-bottom: none;
+        }
+        pre {
+            background: #f3f4f6;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            margin-top: 20px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📋 Load Your Week 1 Quest Tasks</h1>
+        <p>Transform your September Quarter Week 1 plan into trackable assignments!</p>
+        
+        <div class="quest-section">
+            <div class="quest-title">🏗️ Life OS Implementation</div>
+            <ul class="task-list">
+                <li>✓ Set up Notion dashboard skeleton and folder structure</li>
+                <li>✓ Design Daily and Weekly templates</li>
+                <li>✓ Create Finance Tracker database</li>
+                <li>✓ Test Daily Log workflow</li>
+            </ul>
+        </div>
+
+        <div class="quest-section">
+            <div class="quest-title">📚 The Clarity Engine</div>
+            <ul class="task-list">
+                <li>✓ Select 1 book aligned with current interest</li>
+                <li>✓ Create reading tracker in Obsidian</li>
+                <li>✓ Set up Obsidian folder structure</li>
+                <li>✓ Read 175 pages (Week 1 goal)</li>
+            </ul>
+        </div>
+
+        <div class="quest-section">
+            <div class="quest-title">💡 My First Automation App</div>
+            <ul class="task-list">
+                <li>✓ Identify repeatable problem (Assignment Tracker!)</li>
+                <li>✓ Set up project structure</li>
+                <li>✓ Build core CRUD functionality</li>
+                <li>✓ Add filtering and sorting features</li>
+                <li>✓ Create Notion Build Log</li>
+            </ul>
+        </div>
+
+        <div class="quest-section">
+            <div class="quest-title">🏠 Home</div>
+            <ul class="task-list">
+                <li>✓ Grocery shopping for the week</li>
+                <li>✓ Clean and organize workspace</li>
+                <li>✓ Meal prep for busy weekdays</li>
+                <li>✓ Weekly laundry and ironing</li>
+            </ul>
+        </div>
+
+        <div style="margin-top: 30px;">
+            <button onclick="loadWeek1Tasks()">🚀 Load All Week 1 Tasks</button>
+            <button onclick="loadByQuest('lifeos')" class="warning">Load Life OS Only</button>
+            <button onclick="loadByQuest('clarity')" class="warning">Load Clarity Engine Only</button>
+            <button onclick="loadByQuest('automation')" class="warning">Load Automation Only</button>
+            <button onclick="loadByQuest('home')" class="warning">Load Home Only</button>
+            <button onclick="clearAllData()" class="danger">Clear All Data</button>
+        </div>
+
+        <div id="message" class="message"></div>
+
+        <div style="margin-top: 30px;">
+            <a href="index.html"><button class="success">Go to Assignment Tracker →</button></a>
+        </div>
+
+        <h2>📄 For JSON Server (db.json):</h2>
+        <pre id="jsonData"></pre>
+    </div>
+
+    <script>
+        // Calculate dates
+        const today = new Date();
+        const monday = new Date(today);
+        monday.setDate(today.getDate() - today.getDay() + 1); // This Monday
+        const tuesday = new Date(monday);
+        tuesday.setDate(monday.getDate() + 1);
+        const wednesday = new Date(monday);
+        wednesday.setDate(monday.getDate() + 2);
+        const thursday = new Date(monday);
+        thursday.setDate(monday.getDate() + 3);
+        const friday = new Date(monday);
+        friday.setDate(monday.getDate() + 4);
+        const saturday = new Date(monday);
+        saturday.setDate(monday.getDate() + 5);
+        const sunday = new Date(monday);
+        sunday.setDate(monday.getDate() + 6);
+
+        // Week 1 Tasks based on your roadmap
+        const week1Tasks = {
+            lifeos: [
+                {
+                    id: "los-1",
+                    title: "Set up Notion dashboard skeleton",
+                    description: "Create main dashboard page with Quick Actions Widget, Weekly Overview, Finance Snapshot, and Recent Notes Link. Set up folder hierarchy: Daily Log, Weekly Review, Finance Tracker, Projects & Goals.",
+                    subject: "Life OS Implementation",
+                    dueDate: tuesday.toISOString().split('T')[0],
+                    priority: "high",
+                    status: "not_started",
+                    estimatedHours: 3,
+                    actualHours: 0,
+                    createdAt: new Date().toISOString()
+                },
+                {
+                    id: "los-2",
+                    title: "Build Daily Log and Weekly Review templates",
+                    description: "Create Daily Template with: Morning Intention, Time Blocks, Gratitude section, and Reflection. Build Weekly Review with: Big Wins, Lessons Learned, Next Week's Top 3, and Life Areas Check-in (Work, Finance, Health, Relationships, Learning).",
+                    subject: "Life OS Implementation",
+                    dueDate: wednesday.toISOString().split('T')[0],
+                    priority: "high",
+                    status: "not_started",
+                    estimatedHours: 2,
+                    actualHours: 0,
+                    createdAt: new Date().toISOString()
+                },
+                {
+                    id: "los-3",
+                    title: "Create Finance Tracker database",
+                    description: "Set up Finance Tracker with: Monthly Budget view, Transaction Log, Category Analysis, and Savings Goals. Include spending categories and automated monthly summaries.",
+                    subject: "Life OS Implementation",
+                    dueDate: thursday.toISOString().split('T')[0],
+                    priority: "medium",
+                    status: "not_started",
+                    estimatedHours: 2,
+                    actualHours: 0,
+                    createdAt: new Date().toISOString()
+                },
+                {
+                    id: "los-4",
+                    title: "Test Daily Log workflow",
+                    description: "Complete first Daily Log entry. Test all sections: Energy Level, Focus Score, Morning Intention, Time Blocks, Gratitude, and Reflection.",
+                    subject: "Life OS Implementation",
+                    dueDate: friday.toISOString().split('T')[0],
+                    priority: "medium",
+                    status: "not_started",
+                    estimatedHours: 1,
+                    actualHours: 0,
+                    createdAt: new Date().toISOString()
+                }
+            ],
+            clarity: [
+                {
+                    id: "ce-1",
+                    title: "Select first book to read",
+                    description: "Choose from: Atomic Habits, Getting Things Done, The ONE Thing, The Obstacle is the Way, Mindset, Peak Performance, Zero to One, The Mom Test, or Thinking Fast and Slow. Align with current interests and goals.",
+                    subject: "The Clarity Engine",
+                    dueDate: monday.toISOString().split('T')[0],
+                    priority: "high",
+                    status: "not_started",
+                    estimatedHours: 1,
+                    actualHours: 0,
+                    createdAt: new Date().toISOString()
+                },
+                {
+                    id: "ce-2",
+                    title: "Create reading tracker in Obsidian",
+                    description: "Set up Reading Tracker with: Book metadata (title, author, dates), Daily progress checkboxes (35 pages/day), Key insights section, and Action items. Create template for future books.",
+                    subject: "The Clarity Engine",
+                    dueDate: tuesday.toISOString().split('T')[0],
+                    priority: "high",
+                    status: "not_started",
+                    estimatedHours: 1,
+                    actualHours: 0,
+                    createdAt: new Date().toISOString()
+                },
+                {
+                    id: "ce-3",
+                    title: "Set up Obsidian vault structure",
+                    description: "Create folders for: Books (reading notes), Life Logs (daily reflections), Atomic Notes (key insights), and Tags system (#Resonates, #Apply, #ToReview). Set up graph view and linking system.",
+                    subject: "The Clarity Engine",
+                    dueDate: wednesday.toISOString().split('T')[0],
+                    priority: "medium",
+                    status: "not_started",
+                    estimatedHours: 2,
+                    actualHours: 0,
+                    createdAt: new Date().toISOString()
+                },
+                {
+                    id: "ce-4",
+                    title: "Read 175 pages (Week 1 goal)",
+                    description: "Read at least 35 pages per day for 5 days. Extract 1 key idea daily to Obsidian with hashtags. Start building atomic notes collection.",
+                    subject: "The Clarity Engine",
+                    dueDate: friday.toISOString().split('T')[0],
+                    priority: "high",
+                    status: "not_started",
+                    estimatedHours: 7,
+                    actualHours: 0,
+                    createdAt: new Date().toISOString()
+                }
+            ],
+            automation: [
+                {
+                    id: "aa-1",
+                    title: "Identify and validate app idea",
+                    description: "Problem identified: Need for assignment tracker! Validate by listing pain points: manual tracking across subjects, missing deadlines, no priority system, lack of progress visibility.",
+                    subject: "My First Automation App",
+                    dueDate: monday.toISOString().split('T')[0],
+                    priority: "high",
+                    status: "completed",
+                    estimatedHours: 2,
+                    actualHours: 2,
+                    createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString()
+                },
+                {
+                    id: "aa-2",
+                    title: "Set up project structure",
+                    description: "Create folder structure: index.html, css/style.css, js/(app.js, api.js, components.js). Initialize Git repository. Set up basic HTML skeleton.",
+                    subject: "My First Automation App",
+                    dueDate: tuesday.toISOString().split('T')[0],
+                    priority: "high",
+                    status: "in_progress",
+                    estimatedHours: 2,
+                    actualHours: 1,
+                    createdAt: new Date().toISOString()
+                },
+                {
+                    id: "aa-3",
+                    title: "Build core CRUD functionality",
+                    description: "Implement: Create assignments with all fields, Read/display in cards, Update status, Delete with confirmation. Use localStorage first, then add JSON Server.",
+                    subject: "My First Automation App",
+                    dueDate: thursday.toISOString().split('T')[0],
+                    priority: "high",
+                    status: "not_started",
+                    estimatedHours: 5,
+                    actualHours: 0,
+                    createdAt: new Date().toISOString()
+                },
+                {
+                    id: "aa-4",
+                    title: "Add filtering and sorting features",
+                    description: "Implement: Filter by subject/status, Sort by due date/priority/created, Visual priority indicators, Overdue highlighting, Stats dashboard (due this week, overdue count).",
+                    subject: "My First Automation App",
+                    dueDate: friday.toISOString().split('T')[0],
+                    priority: "medium",
+                    status: "not_started",
+                    estimatedHours: 3,
+                    actualHours: 0,
+                    createdAt: new Date().toISOString()
+                },
+                {
+                    id: "aa-5",
+                    title: "Create Notion Build Log",
+                    description: "Document: Daily progress, Challenges faced, Solutions found, Code snippets, Resources used, Next steps. Use for reflection and portfolio.",
+                    subject: "My First Automation App",
+                    dueDate: sunday.toISOString().split('T')[0],
+                    priority: "low",
+                    status: "not_started",
+                    estimatedHours: 1,
+                    actualHours: 0,
+                    createdAt: new Date().toISOString()
+                }
+            ],
+            home: [
+                {
+                    id: "home-1",
+                    title: "Grocery shopping for the week",
+                    description: "Buy vegetables, fruits, and meal prep ingredients. Check pantry for staples. Plan healthy meals for the week.",
+                    subject: "Home",
+                    dueDate: tuesday.toISOString().split('T')[0],
+                    priority: "medium",
+                    status: "not_started",
+                    estimatedHours: 2,
+                    actualHours: 0,
+                    createdAt: new Date().toISOString()
+                },
+                {
+                    id: "home-2",
+                    title: "Clean and organize workspace",
+                    description: "Deep clean desk area, organize cables for better productivity, declutter drawers, and create a focused work environment.",
+                    subject: "Home",
+                    dueDate: sunday.toISOString().split('T')[0],
+                    priority: "low",
+                    status: "not_started",
+                    estimatedHours: 1.5,
+                    actualHours: 0,
+                    createdAt: new Date().toISOString()
+                },
+                {
+                    id: "home-3",
+                    title: "Meal prep for busy weekdays",
+                    description: "Prepare 5 lunch portions and healthy snacks. Cook base ingredients that can be mixed and matched throughout the week.",
+                    subject: "Home",
+                    dueDate: sunday.toISOString().split('T')[0],
+                    priority: "medium",
+                    status: "not_started",
+                    estimatedHours: 3,
+                    actualHours: 0,
+                    createdAt: new Date().toISOString()
+                },
+                {
+                    id: "home-4",
+                    title: "Weekly laundry and ironing",
+                    description: "Wash all clothes, bed sheets, and towels. Iron work clothes for the upcoming week.",
+                    subject: "Home",
+                    dueDate: saturday.toISOString().split('T')[0],
+                    priority: "low",
+                    status: "not_started",
+                    estimatedHours: 2,
+                    actualHours: 0,
+                    createdAt: new Date().toISOString()
+                }
+            ]
+        };
+
+        function loadWeek1Tasks() {
+            const allTasks = [
+                ...week1Tasks.lifeos,
+                ...week1Tasks.clarity,
+                ...week1Tasks.automation,
+                ...week1Tasks.home
+            ];
+            
+            localStorage.setItem('assignments', JSON.stringify(allTasks));
+            showMessage('success', `✅ Loaded ${allTasks.length} Week 1 tasks from all quests!`);
+            updateJsonDisplay(allTasks);
+        }
+
+        function loadByQuest(quest) {
+            const tasks = week1Tasks[quest] || [];
+            const existing = JSON.parse(localStorage.getItem('assignments') || '[]');
+            const filtered = existing.filter(a => !a.id.startsWith(quest.substring(0, 2)));
+            const combined = [...filtered, ...tasks];
+            
+            localStorage.setItem('assignments', JSON.stringify(combined));
+            showMessage('success', `✅ Loaded ${tasks.length} tasks from ${quest} quest!`);
+            updateJsonDisplay(combined);
+        }
+
+        function clearAllData() {
+            if (confirm('Are you sure you want to clear all assignments?')) {
+                localStorage.removeItem('assignments');
+                showMessage('success', '🗑️ All data cleared!');
+                updateJsonDisplay([]);
+            }
+        }
+
+        function showMessage(type, text) {
+            const messageEl = document.getElementById('message');
+            messageEl.className = `message ${type}`;
+            messageEl.textContent = text;
+            messageEl.style.display = 'block';
+        }
+
+        function updateJsonDisplay(data) {
+            const jsonData = {
+                assignments: data
+            };
+            document.getElementById('jsonData').textContent = JSON.stringify(jsonData, null, 2);
+        }
+
+        // Show current data on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            const existing = JSON.parse(localStorage.getItem('assignments') || '[]');
+            updateJsonDisplay(existing);
+        });
+    </script>
+</body>
+</html>
