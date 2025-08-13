@@ -1,13 +1,6 @@
-export interface Branch {
-    id: string;
-    name: string;
-    emails: string[];
-    region?: string;
-  }
-  
-  export const branches: Branch[] = [
-    { id: 'RO', name: 'Regional Office', emails: ['ro.admin@company.com', 'ro.manager@company.com', 'ro.head@company.com'], region: 'HQ' },
-    { id: 'BR001', name: 'Branch 001 - Downtown', emails: ['br001.admin@company.com', 'br001.manager@company.com'], region: 'Central' },
-    { id: 'BR002', name: 'Branch 002 - Westside', emails: ['br002.admin@company.com', 'br002.manager@company.com'], region: 'West' },
+export const branches = [
+    { id: 'BR001', code: 341, name: "Main Branch Islamabad", emails: ["341.bm@nbp.com.pk", "341.obm@nbp.com.pk"] },
+    { id: 'BR002', code: 376, name: "Main Branch Murree", emails: ["376.bm@nbp.com.pk", "376.obm@nbp.com.pk"] },
+    { id: 'BR003', code: 474, name: "Foreign Office Branch", emails: ["474.bm@nbp.com.pk", "474.obm@nbp.com.pk"] },
     // ... add all 34 branches
   ];
