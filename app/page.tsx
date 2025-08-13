@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { collection, addDoc, onSnapshot, query, orderBy } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import { branches } from '@/config/branches';
 
 export default function Home() {
   const [assignments, setAssignments] = useState([]);
