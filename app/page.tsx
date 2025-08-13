@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { collection, query, onSnapshot, updateDoc, doc, Timestamp, orderBy } from 'firebase/firestore';
+import { collection, query, onSnapshot, updateDoc, doc, Timestamp, orderBy, DocumentData } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { branches } from '@/config/branches';
 import Link from 'next/link';
@@ -10,10 +10,10 @@ interface Assignment {
   id: string;
   title: string;
   description?: string;
-  deadline?: any;
+  deadline?: Timestamp;
   priority: string;
   branches: string | (string | number)[];
-  createdAt: any;
+  createdAt: Timestamp;
   overallStatus: string;
 }
 
@@ -22,7 +22,7 @@ interface BranchProgress {
   assignmentId: string;
   branchCode: string | number;
   status: string;
-  completionDate?: any;
+  completionDate?: Timestamp;
   remarks?: string;
 }
 
@@ -61,7 +61,7 @@ export default function Dashboard() {
 
   const updateBranchStatus = async (progressId: string, status: string) => {
     try {
-      const updates: Record<string, any> = { status };
+      const updates: {[key: string]: any} = { status };
       if (status === 'completed') {
         updates.completionDate = Timestamp.now();
       }
