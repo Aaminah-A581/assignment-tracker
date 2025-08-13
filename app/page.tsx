@@ -6,9 +6,29 @@ import { branches } from '@/config/branches';
 import Link from 'next/link';
 import { Plus, Calendar, Clock, CheckCircle } from 'lucide-react';
 
+interface Assignment {
+  id: string;
+  title: string;
+  description?: string;
+  deadline?: any;
+  priority: string;
+  branches: string | (string | number)[];
+  createdAt: any;
+  overallStatus: string;
+}
+
+interface BranchProgress {
+  id: string;
+  assignmentId: string;
+  branchCode: string | number;
+  status: string;
+  completionDate?: any;
+  remarks?: string;
+}
+
 export default function Dashboard() {
-  const [assignments, setAssignments] = useState<any[]>([]);
-  const [branchProgress, setBranchProgress] = useState<any[]>([]);
+  const [assignments, setAssignments] = useState<Assignment[]>([]);
+  const [branchProgress, setBranchProgress] = useState<BranchProgress[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -18,7 +38,7 @@ export default function Dashboard() {
       const data = snapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
-      }));
+      } as Assignment));
       setAssignments(data);
       setLoading(false);
     });
@@ -29,7 +49,7 @@ export default function Dashboard() {
       const data = snapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
-      }));
+      } as BranchProgress));
       setBranchProgress(data);
     });
 
@@ -41,7 +61,7 @@ export default function Dashboard() {
 
   const updateBranchStatus = async (progressId: string, status: string) => {
     try {
-      const updates: any = { status };
+      const updates: Record<string, any> = { status };
       if (status === 'completed') {
         updates.completionDate = Timestamp.now();
       }
@@ -100,7 +120,7 @@ export default function Dashboard() {
           <div className="bg-white p-6 rounded-lg shadow">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-500 text-sm">Today's Completions</p>
+                <p className="text-gray-500 text-sm">Today&apos;s Completions</p>
                 <p className="text-2xl font-bold text-green-600">{stats.todayCompleted}</p>
               </div>
               <CheckCircle className="text-green-500" />
