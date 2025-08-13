@@ -5,7 +5,7 @@ import { collection, query, onSnapshot, updateDoc, doc, Timestamp, orderBy } fro
 import { db } from '@/lib/firebase';
 import { branches } from '@/config/branches';
 import Link from 'next/link';
-import { Plus, CheckCircle, Clock, Users, TrendingUp, Eye } from 'lucide-react';
+import { Plus, CheckCircle, Clock, Users, TrendingUp, ChevronDown, ChevronUp, Calendar, AlertCircle } from 'lucide-react';
 
 interface Assignment {
   id: string;
@@ -29,7 +29,7 @@ export default function Dashboard() {
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [branchProgress, setBranchProgress] = useState<BranchProgress[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showBranches, setShowBranches] = useState<{[key: string]: boolean}>({});
+  const [expandedAssignment, setExpandedAssignment] = useState<string | null>(null);
 
   useEffect(() => {
     const q = query(collection(db, 'assignments'), orderBy('createdAt', 'desc'));
@@ -85,184 +85,199 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-400 via-pink-500 to-red-500 flex items-center justify-center">
-        <div className="text-white text-2xl animate-pulse">Loading...</div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      {/* Colorful Header */}
-      <div className="bg-gradient-to-r from-purple-600 via-pink-600 to-red-600 text-white p-8 shadow-2xl">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <div>
-            <h1 className="text-4xl font-bold mb-2">🎯 Assignment Tracker</h1>
-            <p className="text-pink-100">Managing {branches.length} branches efficiently</p>
+    <div className="min-h-screen bg-gray-50">
+      {/* Ultra Compact Header */}
+      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-3 shadow-lg">
+        <div className="flex justify-between items-center">
+          <div className="flex items-center gap-2">
+            <span className="text-2xl">🎯</span>
+            <h1 className="text-xl font-bold">Assignment Tracker</h1>
+            <span className="text-sm text-blue-100 hidden sm:inline">• {branches.length} branches</span>
           </div>
-          <Link href="/assignments/new" className="bg-yellow-400 hover:bg-yellow-300 text-gray-900 font-bold px-8 py-4 rounded-full transform hover:scale-110 transition-all shadow-xl flex items-center gap-2">
-            <Plus size={24} />
+          <Link 
+            href="/assignments/new" 
+            className="bg-white text-blue-600 hover:bg-yellow-300 px-4 py-1.5 rounded font-bold text-sm transition-all flex items-center gap-1 shadow"
+          >
+            <Plus size={16} />
             NEW ASSIGNMENT
           </Link>
         </div>
       </div>
 
-      {/* Stats Cards */}
-      <div className="max-w-7xl mx-auto -mt-10 px-4">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <div className="bg-gradient-to-br from-green-400 to-green-600 p-6 rounded-2xl shadow-xl text-white transform hover:scale-105 transition-all">
-            <CheckCircle size={40} className="mb-2" />
-            <p className="text-4xl font-bold">{stats.todayCompleted}</p>
-            <p className="text-green-100">Completed Today</p>
+      <div className="px-4 py-4 max-w-7xl mx-auto">
+        {/* Inline Stats Bar */}
+        <div className="bg-white rounded-lg shadow-md p-3 mb-4 flex items-center justify-around">
+          <div className="flex items-center gap-2">
+            <CheckCircle className="text-green-500" size={20} />
+            <div>
+              <span className="text-xl font-bold text-gray-800">{stats.todayCompleted}</span>
+              <span className="text-sm text-gray-600 ml-1">Today</span>
+            </div>
           </div>
           
-          <div className="bg-gradient-to-br from-yellow-400 to-orange-500 p-6 rounded-2xl shadow-xl text-white transform hover:scale-105 transition-all">
-            <Clock size={40} className="mb-2" />
-            <p className="text-4xl font-bold">{stats.totalPending}</p>
-            <p className="text-yellow-100">Total Pending</p>
+          <div className="border-l pl-4 flex items-center gap-2">
+            <Clock className="text-yellow-500" size={20} />
+            <div>
+              <span className="text-xl font-bold text-gray-800">{stats.totalPending}</span>
+              <span className="text-sm text-gray-600 ml-1">Pending</span>
+            </div>
           </div>
           
-          <div className="bg-gradient-to-br from-blue-400 to-blue-600 p-6 rounded-2xl shadow-xl text-white transform hover:scale-105 transition-all">
-            <TrendingUp size={40} className="mb-2" />
-            <p className="text-4xl font-bold">{stats.totalCompleted}</p>
-            <p className="text-blue-100">Total Completed</p>
+          <div className="border-l pl-4 flex items-center gap-2">
+            <TrendingUp className="text-blue-500" size={20} />
+            <div>
+              <span className="text-xl font-bold text-gray-800">{stats.totalCompleted}</span>
+              <span className="text-sm text-gray-600 ml-1">Completed</span>
+            </div>
           </div>
           
-          <div className="bg-gradient-to-br from-purple-400 to-purple-600 p-6 rounded-2xl shadow-xl text-white transform hover:scale-105 transition-all">
-            <Users size={40} className="mb-2" />
-            <p className="text-4xl font-bold">{assignments.length}</p>
-            <p className="text-purple-100">Active Tasks</p>
+          <div className="border-l pl-4 flex items-center gap-2">
+            <Users className="text-purple-500" size={20} />
+            <div>
+              <span className="text-xl font-bold text-gray-800">{assignments.length}</span>
+              <span className="text-sm text-gray-600 ml-1">Active</span>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Assignments */}
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <h2 className="text-2xl font-bold mb-6 text-gray-800">📋 Active Assignments</h2>
-        
+        {/* Assignments Table View */}
         {assignments.length === 0 ? (
-          <div className="bg-white rounded-xl shadow-lg p-12 text-center">
-            <p className="text-xl text-gray-500 mb-4">No assignments yet!</p>
+          <div className="bg-white rounded-lg shadow-md p-8 text-center">
+            <Calendar className="mx-auto text-gray-300 mb-3" size={48} />
+            <p className="text-lg text-gray-600 mb-3">No assignments yet!</p>
             <Link href="/assignments/new" className="text-blue-600 hover:text-blue-800 font-semibold">
               Create your first assignment →
             </Link>
           </div>
         ) : (
-          <div className="space-y-6">
-            {assignments.map((assignment) => {
-              const assignmentProgress = branchProgress.filter(p => p.assignmentId === assignment.id);
-              const completed = assignmentProgress.filter(p => p.status === 'completed').length;
-              const total = assignmentProgress.length;
-              const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
-              const isExpanded = showBranches[assignment.id];
-              
-              return (
-                <div key={assignment.id} className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all">
-                  <div className="p-6">
-                    {/* Assignment Header */}
-                    <div className="flex justify-between items-start mb-4">
-                      <div className="flex-1">
-                        <h3 className="text-2xl font-bold text-gray-800 mb-2">{assignment.title}</h3>
-                        {assignment.description && (
-                          <p className="text-gray-600 mb-3">{assignment.description}</p>
-                        )}
-                        <div className="flex flex-wrap gap-3">
-                          <span className={`px-4 py-2 rounded-full text-white font-bold text-sm ${
-                            assignment.priority === 'urgent' ? 'bg-red-500 animate-pulse' :
-                            assignment.priority === 'high' ? 'bg-orange-500' :
-                            assignment.priority === 'normal' ? 'bg-blue-500' :
-                            'bg-gray-500'
-                          }`}>
-                            {assignment.priority.toUpperCase()}
-                          </span>
-                          <span className="px-4 py-2 bg-purple-100 text-purple-700 rounded-full font-semibold text-sm">
-                            {assignment.branches === 'ALL' ? '🌍 ALL 36 BRANCHES' : `📍 ${Array.isArray(assignment.branches) ? assignment.branches.length : 0} BRANCHES`}
-                          </span>
-                          {assignment.deadline && (
-                            <span className="px-4 py-2 bg-pink-100 text-pink-700 rounded-full font-semibold text-sm">
-                              📅 Due: {assignment.deadline.toDate().toLocaleDateString()}
+          <div className="bg-white rounded-lg shadow-md overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50 border-b">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Assignment</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Priority</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Deadline</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Branches</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Progress</th>
+                    <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {assignments.map((assignment) => {
+                    const assignmentProgress = branchProgress.filter(p => p.assignmentId === assignment.id);
+                    const completed = assignmentProgress.filter(p => p.status === 'completed').length;
+                    const total = assignmentProgress.length;
+                    const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+                    const isExpanded = expandedAssignment === assignment.id;
+                    const isOverdue = assignment.deadline && assignment.deadline.toDate() < new Date();
+                    
+                    return (
+                      <React.Fragment key={assignment.id}>
+                        <tr className="hover:bg-gray-50">
+                          <td className="px-4 py-3">
+                            <div className="text-sm font-medium text-gray-900">{assignment.title}</div>
+                            {assignment.description && (
+                              <div className="text-xs text-gray-500">{assignment.description}</div>
+                            )}
+                          </td>
+                          <td className="px-4 py-3">
+                            <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                              assignment.priority === 'urgent' ? 'bg-red-100 text-red-800' :
+                              assignment.priority === 'high' ? 'bg-orange-100 text-orange-800' :
+                              assignment.priority === 'normal' ? 'bg-blue-100 text-blue-800' :
+                              'bg-gray-100 text-gray-800'
+                            }`}>
+                              {assignment.priority}
                             </span>
-                          )}
-                        </div>
-                      </div>
-                      
-                      {/* Progress Circle */}
-                      <div className="ml-6 text-center">
-                        <div className={`w-24 h-24 rounded-full flex items-center justify-center font-bold text-2xl text-white ${
-                          percentage === 100 ? 'bg-gradient-to-br from-green-400 to-green-600' :
-                          percentage >= 75 ? 'bg-gradient-to-br from-blue-400 to-blue-600' :
-                          percentage >= 50 ? 'bg-gradient-to-br from-yellow-400 to-yellow-600' :
-                          percentage >= 25 ? 'bg-gradient-to-br from-orange-400 to-orange-600' :
-                          'bg-gradient-to-br from-red-400 to-red-600'
-                        }`}>
-                          {percentage}%
-                        </div>
-                        <p className="text-sm text-gray-600 mt-2">{completed}/{total} done</p>
-                      </div>
-                    </div>
-
-                    {/* Progress Bar */}
-                    <div className="mb-4">
-                      <div className="w-full bg-gray-200 rounded-full h-4 overflow-hidden">
-                        <div 
-                          className={`h-full rounded-full transition-all duration-500 ${
-                            percentage === 100 ? 'bg-gradient-to-r from-green-400 to-green-600' :
-                            'bg-gradient-to-r from-yellow-400 to-orange-500'
-                          }`}
-                          style={{ width: `${percentage}%` }}
-                        />
-                      </div>
-                    </div>
-
-                    {/* View Branches Button */}
-                    <button
-                      onClick={() => setShowBranches({...showBranches, [assignment.id]: !isExpanded})}
-                      className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold py-3 rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all flex items-center justify-center gap-2"
-                    >
-                      <Eye size={20} />
-                      {isExpanded ? 'HIDE' : 'VIEW'} BRANCH DETAILS
-                    </button>
-
-                    {/* Branch Details */}
-                    {isExpanded && (
-                      <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                        {assignmentProgress.map((prog) => {
-                          const branch = branches.find(b => b.code === prog.branchCode || b.code === Number(prog.branchCode));
-                          const isCompleted = prog.status === 'completed';
-                          
-                          return (
+                          </td>
+                          <td className="px-4 py-3 text-sm text-gray-500">
+                            {assignment.createdAt?.toDate().toLocaleDateString()}
+                          </td>
+                          <td className="px-4 py-3 text-sm">
+                            {assignment.deadline ? (
+                              <span className={isOverdue ? 'text-red-600 font-semibold' : 'text-gray-500'}>
+                                {assignment.deadline.toDate().toLocaleDateString()}
+                                {isOverdue && <AlertCircle className="inline ml-1" size={14} />}
+                              </span>
+                            ) : (
+                              <span className="text-gray-400">-</span>
+                            )}
+                          </td>
+                          <td className="px-4 py-3 text-sm text-gray-500">
+                            {assignment.branches === 'ALL' ? 'All 36' : Array.isArray(assignment.branches) ? assignment.branches.length : 0}
+                          </td>
+                          <td className="px-4 py-3">
+                            <div className="flex items-center">
+                              <div className="flex-1">
+                                <div className="flex items-center">
+                                  <div className="w-24 bg-gray-200 rounded-full h-2">
+                                    <div 
+                                      className={`h-2 rounded-full ${
+                                        percentage === 100 ? 'bg-green-500' :
+                                        percentage >= 50 ? 'bg-blue-500' :
+                                        'bg-orange-500'
+                                      }`}
+                                      style={{ width: `${percentage}%` }}
+                                    />
+                                  </div>
+                                  <span className="ml-2 text-sm font-medium text-gray-700">{percentage}%</span>
+                                </div>
+                                <div className="text-xs text-gray-500 mt-1">{completed}/{total}</div>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-4 py-3 text-center">
                             <button
-                              key={prog.id}
-                              onClick={() => updateBranchStatus(prog.id, isCompleted ? 'pending' : 'completed')}
-                              className={`p-4 rounded-lg font-semibold transition-all transform hover:scale-105 ${
-                                isCompleted 
-                                  ? 'bg-gradient-to-br from-green-100 to-green-200 text-green-800 border-2 border-green-400' 
-                                  : 'bg-gradient-to-br from-gray-100 to-gray-200 text-gray-700 border-2 border-gray-300 hover:from-yellow-100 hover:to-yellow-200'
-                              }`}
+                              onClick={() => setExpandedAssignment(isExpanded ? null : assignment.id)}
+                              className="text-blue-600 hover:text-blue-800"
                             >
-                              <p className="font-bold">{branch?.code}</p>
-                              <p className="text-sm">{branch?.name || 'Unknown Branch'}</p>
-                              <p className="mt-2">
-                                {isCompleted ? (
-                                  <span className="text-green-600">✅ COMPLETED</span>
-                                ) : (
-                                  <span className="text-orange-600">⏳ PENDING</span>
-                                )}
-                              </p>
-                              {prog.completionDate && (
-                                <p className="text-xs mt-1">
-                                  Done: {prog.completionDate.toDate().toLocaleDateString()}
-                                </p>
-                              )}
+                              {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
                             </button>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
+                          </td>
+                        </tr>
+                        {isExpanded && (
+                          <tr>
+                            <td colSpan={7} className="px-4 py-3 bg-gray-50">
+                              <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2">
+                                {assignmentProgress.map((prog) => {
+                                  const branch = branches.find(b => b.code === prog.branchCode || b.code === Number(prog.branchCode));
+                                  const isCompleted = prog.status === 'completed';
+                                  
+                                  return (
+                                    <button
+                                      key={prog.id}
+                                      onClick={() => updateBranchStatus(prog.id, isCompleted ? 'pending' : 'completed')}
+                                      className={`p-2 rounded text-xs font-medium transition-all ${
+                                        isCompleted 
+                                          ? 'bg-green-100 text-green-800 hover:bg-green-200' 
+                                          : 'bg-white border border-gray-300 text-gray-700 hover:bg-yellow-50'
+                                      }`}
+                                      title={branch?.name || 'Unknown Branch'}
+                                    >
+                                      <div className="font-bold">{branch?.code}</div>
+                                      <div className="text-xs opacity-75">{isCompleted ? '✓' : '○'}</div>
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                            </td>
+                          </tr>
+                        )}
+                      </React.Fragment>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
       </div>
