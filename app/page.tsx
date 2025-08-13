@@ -1,4 +1,7 @@
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
+
 import { useState, useEffect } from 'react';
 import { collection, query, onSnapshot, updateDoc, doc, Timestamp, orderBy } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
@@ -61,11 +64,16 @@ export default function Dashboard() {
 
   const updateBranchStatus = async (progressId: string, status: string) => {
     try {
-      const updates: {[key: string]: any} = { status };
       if (status === 'completed') {
-        updates.completionDate = Timestamp.now();
+        await updateDoc(doc(db, 'branchProgress', progressId), {
+          status,
+          completionDate: Timestamp.now()
+        });
+      } else {
+        await updateDoc(doc(db, 'branchProgress', progressId), {
+          status
+        });
       }
-      await updateDoc(doc(db, 'branchProgress', progressId), updates);
     } catch (error) {
       console.error('Error updating status:', error);
     }
