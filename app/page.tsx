@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { collection, query, onSnapshot, updateDoc, doc, Timestamp, orderBy, DocumentData } from 'firebase/firestore';
+import { collection, query, onSnapshot, updateDoc, doc, Timestamp, orderBy } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { branches } from '@/config/branches';
 import Link from 'next/link';
