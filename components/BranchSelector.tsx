@@ -4,8 +4,8 @@ import { branches } from '@/config/branches';
 import { Check } from 'lucide-react';
 
 interface BranchSelectorProps {
-  selectedBranches: string[];
-  onSelectionChange: (branches: string[]) => void;
+  selectedBranches: (string | number)[];
+  onSelectionChange: (branches: (string | number)[]) => void;
 }
 
 export default function BranchSelector({ selectedBranches, onSelectionChange }: BranchSelectorProps) {
@@ -14,19 +14,19 @@ export default function BranchSelector({ selectedBranches, onSelectionChange }: 
   const handleSelectAll = (checked: boolean) => {
     setSelectAll(checked);
     if (checked) {
-      onSelectionChange(branches.map(b => b.id));
+      onSelectionChange(branches.map(b => b.code));
     } else {
       onSelectionChange([]);
     }
   };
 
-  const handleBranchToggle = (branchId: string) => {
+  const handleBranchToggle = (branchCode: string | number) => {
     if (selectAll) setSelectAll(false);
     
-    if (selectedBranches.includes(branchId)) {
-      onSelectionChange(selectedBranches.filter(id => id !== branchId));
+    if (selectedBranches.includes(branchCode)) {
+      onSelectionChange(selectedBranches.filter(code => code !== branchCode));
     } else {
-      onSelectionChange([...selectedBranches, branchId]);
+      onSelectionChange([...selectedBranches, branchCode]);
     }
   };
 
@@ -49,22 +49,22 @@ export default function BranchSelector({ selectedBranches, onSelectionChange }: 
       <div className="max-h-96 overflow-y-auto border rounded-lg p-2">
         {branches.map((branch) => (
           <label
-            key={branch.id}
+            key={branch.code}
             className="flex items-center p-3 hover:bg-gray-50 rounded cursor-pointer"
           >
             <input
               type="checkbox"
-              checked={selectedBranches.includes(branch.id)}
-              onChange={() => handleBranchToggle(branch.id)}
+              checked={selectedBranches.includes(branch.code)}
+              onChange={() => handleBranchToggle(branch.code)}
               className="mr-3 h-4 w-4 text-blue-600"
             />
             <div className="flex-1">
               <div className="font-medium">{branch.name}</div>
               <div className="text-sm text-gray-500">
-                {branch.emails.length} email contacts
+                Code: {branch.code} • {branch.emails.length} email contacts
               </div>
             </div>
-            {selectedBranches.includes(branch.id) && (
+            {selectedBranches.includes(branch.code) && (
               <Check className="text-green-500" size={20} />
             )}
           </label>
@@ -75,12 +75,6 @@ export default function BranchSelector({ selectedBranches, onSelectionChange }: 
         <p className="text-sm text-gray-600">
           Selected: {selectAll ? 'ALL BRANCHES' : `${selectedBranches.length} branch(es)`}
         </p>
-        {selectedBranches.length > 0 && !selectAll && (
-          <p className="text-xs text-gray-500 mt-1">
-            {selectedBranches.slice(0, 5).join(', ')}
-            {selectedBranches.length > 5 && ` +${selectedBranches.length - 5} more`}
-          </p>
-        )}
       </div>
     </div>
   );
