@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assignment Tracker</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📚 Assignment Tracker</h1>
+            <div class="stats">
+                <span class="stat-item">Total: <strong id="totalCount">0</strong></span>
+                <span class="stat-item">Completed: <strong id="completedCount">0</strong></span>
+                <span class="stat-item">Due This Week: <strong id="weekCount">0</strong></span>
+                <span class="stat-item">Overdue: <strong id="overdueCount">0</strong></span>
+            </div>
+        </header>
+
+        <main>
+            <!-- Add Assignment Form with Subject Dropdown -->
+            <section class="add-section">
+                <button id="toggleForm" class="btn-primary">+ New Assignment</button>
+                <form id="assignmentForm" class="hidden">
+                    <input type="text" id="title" placeholder="Assignment Title" required>
+                    
+                    <!-- Subject dropdown instead of text input -->
+                    <select id="subject" required>
+                        <option value="">Select Quest/Area</option>
+                        <option value="Life OS Implementation">🏗️ Life OS Implementation</option>
+                        <option value="The Clarity Engine">📚 The Clarity Engine</option>
+                        <option value="My First Automation App">💡 My First Automation App</option>
+                        <option value="Home">🏠 Home</option>
+                    </select>
+                    
+                    <textarea id="description" placeholder="Description"></textarea>
+                    <input type="date" id="dueDate" required>
+                    <select id="priority">
+                        <option value="low">Low Priority</option>
+                        <option value="medium">Medium Priority</option>
+                        <option value="high">High Priority</option>
+                    </select>
+                    <input type="number" id="estimatedHours" placeholder="Estimated Hours" min="0" step="0.5">
+                    <button type="submit">Add Assignment</button>
+                    <button type="button" id="cancelForm">Cancel</button>
+                </form>
+            </section>
+
+            <!-- Filter/Sort Controls -->
+            <section class="controls">
+                <select id="viewToggle">
+                    <option value="grouped">📊 Quest View</option>
+                    <option value="list">📋 List View</option>
+                </select>
+                <select id="filterSubject">
+                    <option value="">All Subjects</option>
+                </select>
+                <select id="filterStatus">
+                    <option value="">All Status</option>
+                    <option value="not_started">Not Started</option>
+                    <option value="in_progress">In Progress</option>
+                    <option value="completed">Completed</option>
+                </select>
+                <select id="sortBy">
+                    <option value="dueDate">Sort by Due Date</option>
+                    <option value="priority">Sort by Priority</option>
+                    <option value="created">Sort by Created</option>
+                </select>
+            </section>
+
+            <!-- Assignments List -->
+            <section id="assignmentsList" class="assignments-grouped">
+                <!-- Dynamic content -->
+            </section>
+        </main>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
